@@ -5,17 +5,32 @@
 #include "opencv2/highgui/highgui.hpp"
 //#include <opencv2\cv.h>
 #include "opencv2/opencv.hpp"
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <netdb.h> 
+#include<arpa/inet.h>
+
 
 using namespace std;
 using namespace cv;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
-int H_MIN = 0;
-int H_MAX = 256;
-int S_MIN = 0;
-int S_MAX = 256;
+int H_MIN = 165;
+int H_MAX = 183;
+int S_MIN = 40;
+int S_MAX = 187;
 int V_MIN = 0;
 int V_MAX = 256;
+
+int H_MIN2 = 22;
+int H_MAX2 = 183;
+int S_MIN2 = 57;
+int S_MAX2 = 187;
+int V_MIN2 = 204;
+int V_MAX2 = 256;
+
 //default capture width and height
 const int FRAME_WIDTH = 640;
 const int FRAME_HEIGHT = 480;
@@ -30,6 +45,7 @@ const std::string windowName1 = "HSV Image";
 const std::string windowName2 = "Thresholded Image";
 const std::string windowName3 = "After Morphological Operations";
 const std::string trackbarWindowName = "Trackbars";
+
 
 
 void on_mouse(int e, int x, int y, int d, void *ptr)
@@ -66,6 +82,13 @@ void createTrackbars() {
 	sprintf(TrackbarName, "S_MAX", S_MAX);
 	sprintf(TrackbarName, "V_MIN", V_MIN);
 	sprintf(TrackbarName, "V_MAX", V_MAX);
+ 
+  sprintf(TrackbarName, "H_MIN2", H_MIN2);
+	sprintf(TrackbarName, "H_MAX2", H_MAX2);
+	sprintf(TrackbarName, "S_MIN2", S_MIN2);
+	sprintf(TrackbarName, "S_MAX2", S_MAX2);
+	sprintf(TrackbarName, "V_MIN2", V_MIN2);
+	sprintf(TrackbarName, "V_MAX2", V_MAX2);
 	//create trackbars and insert them into window
 	//3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
 	//the max value the trackbar can move (eg. H_HIGH),
@@ -77,6 +100,14 @@ void createTrackbars() {
 	createTrackbar("S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar);
 	createTrackbar("V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar);
 	createTrackbar("V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar);
+ 
+ createTrackbar("H_MIN2", trackbarWindowName, &H_MIN2, H_MAX2, on_trackbar);
+	createTrackbar("H_MAX2", trackbarWindowName, &H_MAX2, H_MAX2, on_trackbar);
+	createTrackbar("S_MIN2", trackbarWindowName, &S_MIN2, S_MAX2, on_trackbar);
+	createTrackbar("S_MAX2", trackbarWindowName, &S_MAX2, S_MAX2, on_trackbar);
+	createTrackbar("V_MIN2", trackbarWindowName, &V_MIN2, V_MAX2, on_trackbar);
+	createTrackbar("V_MAX2", trackbarWindowName, &V_MAX2, V_MAX2, on_trackbar);
+
 
 
 }
@@ -177,6 +208,40 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 }
 int main(int argc, char* argv[])
 {
+/*
+  int clientSocket;
+  char buffer[1024];
+  struct sockaddr_in serverAddr;
+  socklen_t addr_size;
+
+  //---- Create the socket. The three arguments are: ----
+  // 1) Internet domain 2) Stream socket 3) Default protocol (TCP in this case) 
+  clientSocket = socket(PF_INET, SOCK_STREAM, 0);
+  
+  //---- Configure settings of the server address struct ----
+  // Address family = Internet 
+  serverAddr.sin_family = AF_INET;
+  // Set port number, using htons function to use proper byte order 
+  serverAddr.sin_port = htons(20232);
+  // Set IP address to localhost 
+  serverAddr.sin_addr.s_addr = inet_addr("193.226.12.217");
+  // Set all bits of the padding field to 0 
+  memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
+
+  //---- Connect the socket to the server using the address struct ----
+  addr_size = sizeof serverAddr;
+  connect(clientSocket, (struct sockaddr *) &serverAddr, addr_size);
+
+  //---- Read the message from the server into the buffer ----
+  recv(clientSocket, buffer, 1024, 0);
+
+  //---- Print the received message ----
+  printf("Data received: %s",buffer);   
+
+  
+    send(clientSocket,buffer,13,0);
+    return 0;
+*/
 
 	//some boolean variables for different functionality within this
 	//program
@@ -197,7 +262,7 @@ int main(int argc, char* argv[])
 	//video capture object to acquire webcam feed
 	VideoCapture capture;
 	//open capture object at location zero (default location for webcam)
-	capture.open(0);
+	capture.open("rtmp://172.16.254.99/live/nimic");
 	//set height and width of capture frame
 	capture.set(CV_CAP_PROP_FRAME_WIDTH, FRAME_WIDTH);
 	capture.set(CV_CAP_PROP_FRAME_HEIGHT, FRAME_HEIGHT);
@@ -206,7 +271,7 @@ int main(int argc, char* argv[])
 
 
 
-	
+
 	while (1) {
 
 
@@ -217,6 +282,8 @@ int main(int argc, char* argv[])
 		//filter HSV image between values and store filtered image to
 		//threshold matrix
 		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+   
+   //inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), threshold);
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if (useMorphOps)
@@ -230,13 +297,11 @@ int main(int argc, char* argv[])
 		//show frames
 		imshow(windowName2, threshold);
 		imshow(windowName, cameraFeed);
-		imshow(windowName1, HSV);
+		//imshow(windowName1, HSV);
 		setMouseCallback("Original Image", on_mouse, &p);
 		//delay 30ms so that screen can refresh.
 		//image will not appear without this waitKey() command
 		waitKey(30);
 	}
-
-	return 0;
+  return 0;
 }
-

@@ -25,8 +25,9 @@
 using namespace std;
 using namespace cv;
 
-int myPos1, myPos2;
-int initPos1, initPos2;
+int myX, myY;
+int initX, initY;
+int enemyX,enemyY;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
 int H_MIN = 169;
@@ -35,6 +36,8 @@ int S_MIN = 20;
 int S_MAX = 256;
 int V_MIN = 105;
 int V_MAX = 256;
+
+
 int H_MIN2 = 27;
 int H_MAX2 = 185;
 int S_MIN2 = 65;
@@ -241,6 +244,7 @@ void detect_position(){
 		//filter HSV image between values and store filtered image to
 		//threshold matrix
 		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+     
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if (useMorphOps)
@@ -251,8 +255,8 @@ void detect_position(){
 		if (trackObjects)
 {
 			trackFilteredObject(x, y, threshold, cameraFeed);
-                  myPos1=x;
-                  myPos2=y;
+                  myX=x;
+                  myY=y;
 }
 		//show frames
 		imshow(windowName2, threshold);
@@ -262,7 +266,7 @@ void detect_position(){
 		//delay 30ms so that screen can refresh.
 		//image will not appear without this waitKey() command
 		waitKey(30);
-//store image to matrix
+    //store image to matrix
 		capture.read(cameraFeed);
 		//convert frame from BGR to HSV colorspace
 		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
@@ -279,8 +283,8 @@ void detect_position(){
 		if (trackObjects)
                  {
 			trackFilteredObject(x, y, threshold, cameraFeed);
-                  enemyPos1=x;
-                  enemyPos2=y;
+                  enemyX=x;
+                  enemyY=y;
                  } 
 		//show frames
 		imshow(windowName2, threshold);
@@ -371,13 +375,13 @@ int main(int argc, char* argv[])
    
         char comenzi[50];
         detect_position();
-        initPos1 = myPos1;
-        initPos2 = myPos2;
+        initX = myX;
+        initY = myY;
 		
         move(buffer, sock);
         detect_position();
-        printf("initial coords: %d, %d\n", initPos1, initPos2);
-		printf("current coords: %d, %d\n", myPos1, myPos2);
+        printf("initial coords: %d, %d\n", initX, initY);
+		    printf("current coords: %d, %d\n", myX, myY);
         //comenzi=strategie();
         //socket_con(comenzi);
 	

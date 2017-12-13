@@ -35,10 +35,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/cloud/Pop-Cristian-Sorin
+CMAKE_SOURCE_DIR = /home/cloud/Cristi
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/cloud/Pop-Cristian-Sorin
+CMAKE_BINARY_DIR = /home/cloud/Cristi
 
 # Include any dependencies generated for this target.
 include CMakeFiles/VideoTool.dir/depend.make
@@ -51,17 +51,17 @@ include CMakeFiles/VideoTool.dir/flags.make
 
 CMakeFiles/VideoTool.dir/VideoTool.cpp.o: CMakeFiles/VideoTool.dir/flags.make
 CMakeFiles/VideoTool.dir/VideoTool.cpp.o: VideoTool.cpp
-	$(CMAKE_COMMAND) -E cmake_progress_report /home/cloud/Pop-Cristian-Sorin/CMakeFiles $(CMAKE_PROGRESS_1)
+	$(CMAKE_COMMAND) -E cmake_progress_report /home/cloud/Cristi/CMakeFiles $(CMAKE_PROGRESS_1)
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Building CXX object CMakeFiles/VideoTool.dir/VideoTool.cpp.o"
-	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/VideoTool.dir/VideoTool.cpp.o -c /home/cloud/Pop-Cristian-Sorin/VideoTool.cpp
+	/usr/bin/c++   $(CXX_DEFINES) $(CXX_FLAGS) -o CMakeFiles/VideoTool.dir/VideoTool.cpp.o -c /home/cloud/Cristi/VideoTool.cpp
 
 CMakeFiles/VideoTool.dir/VideoTool.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/VideoTool.dir/VideoTool.cpp.i"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/cloud/Pop-Cristian-Sorin/VideoTool.cpp > CMakeFiles/VideoTool.dir/VideoTool.cpp.i
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -E /home/cloud/Cristi/VideoTool.cpp > CMakeFiles/VideoTool.dir/VideoTool.cpp.i
 
 CMakeFiles/VideoTool.dir/VideoTool.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/VideoTool.dir/VideoTool.cpp.s"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/cloud/Pop-Cristian-Sorin/VideoTool.cpp -o CMakeFiles/VideoTool.dir/VideoTool.cpp.s
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_FLAGS) -S /home/cloud/Cristi/VideoTool.cpp -o CMakeFiles/VideoTool.dir/VideoTool.cpp.s
 
 CMakeFiles/VideoTool.dir/VideoTool.cpp.o.requires:
 .PHONY : CMakeFiles/VideoTool.dir/VideoTool.cpp.o.requires
@@ -125,6 +125,6 @@ CMakeFiles/VideoTool.dir/clean:
 .PHONY : CMakeFiles/VideoTool.dir/clean
 
 CMakeFiles/VideoTool.dir/depend:
-	cd /home/cloud/Pop-Cristian-Sorin && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/cloud/Pop-Cristian-Sorin /home/cloud/Pop-Cristian-Sorin /home/cloud/Pop-Cristian-Sorin /home/cloud/Pop-Cristian-Sorin /home/cloud/Pop-Cristian-Sorin/CMakeFiles/VideoTool.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/cloud/Cristi && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/cloud/Cristi /home/cloud/Cristi /home/cloud/Cristi /home/cloud/Cristi /home/cloud/Cristi/CMakeFiles/VideoTool.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/VideoTool.dir/depend
 

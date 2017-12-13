@@ -6,7 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/cloud/echiparacheta/FIC2017/VideoTool.cpp
+/home/cloud/Cristi/VideoTool.cpp
 sstream
 -
 string
@@ -14,9 +14,31 @@ string
 iostream
 -
 opencv2/highgui/highgui.hpp
-/home/cloud/echiparacheta/FIC2017/opencv2/highgui/highgui.hpp
+/home/cloud/Cristi/opencv2/highgui/highgui.hpp
 opencv2/opencv.hpp
-/home/cloud/echiparacheta/FIC2017/opencv2/opencv.hpp
+/home/cloud/Cristi/opencv2/opencv.hpp
+stdio.h
+-
+stdlib.h
+-
+sys/types.h
+-
+sys/socket.h
+-
+netdb.h
+-
+netinet/in.h
+-
+string.h
+-
+stdlib.h
+-
+arpa/inet.h
+-
+netinet/in.h
+-
+unistd.h
+-
 
 /usr/local/include/opencv/cxcore.h
 opencv2/core/core_c.h

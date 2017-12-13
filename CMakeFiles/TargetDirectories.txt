@@ -1,1 +1,1 @@
-/home/cloud/Pop-Cristian-Sorin/CMakeFiles/VideoTool.dir
+/home/cloud/Cristi/CMakeFiles/VideoTool.dir

@@ -5,32 +5,42 @@
 #include "opencv2/highgui/highgui.hpp"
 //#include <opencv2\cv.h>
 #include "opencv2/opencv.hpp"
+
 #include <stdio.h>
+#include <stdlib.h>
+
 #include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
-#include <netdb.h> 
-#include<arpa/inet.h>
 
+
+#include <netdb.h>
+#include <netinet/in.h>
+
+#include <string.h>
+#include <stdlib.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+#include <unistd.h>
 
 using namespace std;
 using namespace cv;
+
+int myPos1, myPos2;
+int initPos1, initPos2;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
-int H_MIN = 165;
-int H_MAX = 183;
-int S_MIN = 40;
-int S_MAX = 187;
-int V_MIN = 0;
+int H_MIN = 169;
+int H_MAX = 185;
+int S_MIN = 20;
+int S_MAX = 256;
+int V_MIN = 105;
 int V_MAX = 256;
-
-int H_MIN2 = 22;
-int H_MAX2 = 183;
-int S_MIN2 = 57;
-int S_MAX2 = 187;
-int V_MIN2 = 204;
+int H_MIN2 = 27;
+int H_MAX2 = 185;
+int S_MIN2 = 65;
+int S_MAX2 = 256;
+int V_MIN2 = 108;
 int V_MAX2 = 256;
-
 //default capture width and height
 const int FRAME_WIDTH = 640;
 const int FRAME_HEIGHT = 480;
@@ -82,13 +92,6 @@ void createTrackbars() {
 	sprintf(TrackbarName, "S_MAX", S_MAX);
 	sprintf(TrackbarName, "V_MIN", V_MIN);
 	sprintf(TrackbarName, "V_MAX", V_MAX);
- 
-  sprintf(TrackbarName, "H_MIN2", H_MIN2);
-	sprintf(TrackbarName, "H_MAX2", H_MAX2);
-	sprintf(TrackbarName, "S_MIN2", S_MIN2);
-	sprintf(TrackbarName, "S_MAX2", S_MAX2);
-	sprintf(TrackbarName, "V_MIN2", V_MIN2);
-	sprintf(TrackbarName, "V_MAX2", V_MAX2);
 	//create trackbars and insert them into window
 	//3 parameters are: the address of the variable that is changing when the trackbar is moved(eg.H_LOW),
 	//the max value the trackbar can move (eg. H_HIGH),
@@ -100,17 +103,10 @@ void createTrackbars() {
 	createTrackbar("S_MAX", trackbarWindowName, &S_MAX, S_MAX, on_trackbar);
 	createTrackbar("V_MIN", trackbarWindowName, &V_MIN, V_MAX, on_trackbar);
 	createTrackbar("V_MAX", trackbarWindowName, &V_MAX, V_MAX, on_trackbar);
- 
- createTrackbar("H_MIN2", trackbarWindowName, &H_MIN2, H_MAX2, on_trackbar);
-	createTrackbar("H_MAX2", trackbarWindowName, &H_MAX2, H_MAX2, on_trackbar);
-	createTrackbar("S_MIN2", trackbarWindowName, &S_MIN2, S_MAX2, on_trackbar);
-	createTrackbar("S_MAX2", trackbarWindowName, &S_MAX2, S_MAX2, on_trackbar);
-	createTrackbar("V_MIN2", trackbarWindowName, &V_MIN2, V_MAX2, on_trackbar);
-	createTrackbar("V_MAX2", trackbarWindowName, &V_MAX2, V_MAX2, on_trackbar);
-
 
 
 }
+
 void drawObject(int x, int y, Mat &frame) {
 
 	//use some of the openCV drawing functions to draw crosshairs
@@ -157,6 +153,7 @@ void morphOps(Mat &thresh) {
 
 
 }
+
 void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 
 	Mat temp;
@@ -206,46 +203,8 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 		else putText(cameraFeed, "TOO MUCH NOISE! ADJUST FILTER", Point(0, 50), 1, 2, Scalar(0, 0, 255), 2);
 	}
 }
-int main(int argc, char* argv[])
-{
-/*
-  int clientSocket;
-  char buffer[1024];
-  struct sockaddr_in serverAddr;
-  socklen_t addr_size;
-
-  //---- Create the socket. The three arguments are: ----
-  // 1) Internet domain 2) Stream socket 3) Default protocol (TCP in this case) 
-  clientSocket = socket(PF_INET, SOCK_STREAM, 0);
-  
-  //---- Configure settings of the server address struct ----
-  // Address family = Internet 
-  serverAddr.sin_family = AF_INET;
-  // Set port number, using htons function to use proper byte order 
-  serverAddr.sin_port = htons(20232);
-  // Set IP address to localhost 
-  serverAddr.sin_addr.s_addr = inet_addr("193.226.12.217");
-  // Set all bits of the padding field to 0 
-  memset(serverAddr.sin_zero, '\0', sizeof serverAddr.sin_zero);  
-
-  //---- Connect the socket to the server using the address struct ----
-  addr_size = sizeof serverAddr;
-  connect(clientSocket, (struct sockaddr *) &serverAddr, addr_size);
-
-  //---- Read the message from the server into the buffer ----
-  recv(clientSocket, buffer, 1024, 0);
-
-  //---- Print the received message ----
-  printf("Data received: %s",buffer);   
-
-  
-    send(clientSocket,buffer,13,0);
-    return 0;
-*/
-
-	//some boolean variables for different functionality within this
-	//program
-	bool trackObjects = true;
+void detect_position(){
+    bool trackObjects = true;
 	bool useMorphOps = true;
 
 	Point p;
@@ -271,7 +230,7 @@ int main(int argc, char* argv[])
 
 
 
-
+	
 	while (1) {
 
 
@@ -282,8 +241,6 @@ int main(int argc, char* argv[])
 		//filter HSV image between values and store filtered image to
 		//threshold matrix
 		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-   
-   //inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), threshold);
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if (useMorphOps)
@@ -292,8 +249,11 @@ int main(int argc, char* argv[])
 		//this function will return the x and y coordinates of the
 		//filtered object
 		if (trackObjects)
+{
 			trackFilteredObject(x, y, threshold, cameraFeed);
-
+                  myPos1=x;
+                  myPos2=y;
+}
 		//show frames
 		imshow(windowName2, threshold);
 		imshow(windowName, cameraFeed);
@@ -302,6 +262,126 @@ int main(int argc, char* argv[])
 		//delay 30ms so that screen can refresh.
 		//image will not appear without this waitKey() command
 		waitKey(30);
+//store image to matrix
+		capture.read(cameraFeed);
+		//convert frame from BGR to HSV colorspace
+		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
+		//filter HSV image between values and store filtered image to
+		//threshold matrix
+		inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), threshold);
+		//perform morphological operations on thresholded image to eliminate noise
+		//and emphasize the filtered object(s)
+		if (useMorphOps)
+			morphOps(threshold);
+		//pass in thresholded frame to our object tracking function
+		//this function will return the x and y coordinates of the
+		//filtered object
+		if (trackObjects)
+                 {
+			trackFilteredObject(x, y, threshold, cameraFeed);
+                  enemyPos1=x;
+                  enemyPos2=y;
+                 } 
+		//show frames
+		imshow(windowName2, threshold);
+		imshow(windowName, cameraFeed);
+		//imshow(windowName1, HSV);
+		setMouseCallback("Original Image", on_mouse, &p);
+		//delay 30ms so that screen can refresh.
+		//image will not appear without this waitKey() command
+		waitKey(30);
+exit(0);
 	}
-  return 0;
+}
+
+
+
+void move(char *buffer ,int sock){
+  int i, n;
+  for(i=0;i<strlen(buffer)-1;i++){
+	char buffm[50];
+  
+	if(buffer[i]=='l'||buffer[i]=='r'||buffer[i]=='f'||buffer[i]=='b'||buffer[i]=='s'){
+	  strncpy(buffm,&buffer[i],3);
+	  buffm[1]='\0';
+	  printf("%s \n",buffm);
+	  
+	  n = write(sock, buffm, 1);
+	  sleep(1);
+	}
+  }
+  n = write(sock, "s", 1);
+}
+
+/*
+void processCharacters(int sock, char *buff[], int nr){
+	int i;
+	for(i=0;i<nr;i++){
+    	send(sock, buff[i], strlen(buff[i]), 0);
+    	printf("Message sent: %s\n", buff[i]);
+		sleep(1);
+	}
+}*/
+
+int main(int argc, char* argv[])
+{
+   int sock = 0, portNr, n;
+   struct sockaddr_in serv_addr;
+   struct hostent *server;
+
+   char buffer[256];
+
+
+   portNr = 20236;
+
+   /* Create a socket point */
+   sock = socket(AF_INET, SOCK_STREAM, 0);
+
+   if (sock < 0) {
+      perror("ERROR opening socket");
+      exit(1);
+   }
+
+   server = gethostbyname("193.226.12.217");
+   if (server == NULL) {
+      fprintf(stderr,"ERROR, no such host\n");
+      exit(0);
+   }
+
+   bzero((char *) &serv_addr, sizeof(serv_addr));
+   serv_addr.sin_family = AF_INET;
+   bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
+   serv_addr.sin_port = htons(portNr);
+
+   
+   if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
+      perror("ERROR connecting");
+      exit(1);
+   }
+
+   /* Now ask for a message from the user, this message
+      * will be read by server
+   */
+       printf("Please enter the message: ");
+       bzero(buffer, 256);
+       fgets(buffer, 255, stdin);
+
+       /* Now read server response */
+       printf("%s\n", buffer);
+   
+        char comenzi[50];
+        detect_position();
+        initPos1 = myPos1;
+        initPos2 = myPos2;
+		
+        move(buffer, sock);
+        detect_position();
+        printf("initial coords: %d, %d\n", initPos1, initPos2);
+		printf("current coords: %d, %d\n", myPos1, myPos2);
+        //comenzi=strategie();
+        //socket_con(comenzi);
+	
+	close(sock);
+
+	return 0;
 }

@@ -381,7 +381,7 @@ int main(int argc, char* argv[])
         //comenzi=strategie();
         //socket_con(comenzi);
 	
-	close(sock);
+		close(sock);
 
-	return 0;
+		return 0;
 }

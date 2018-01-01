@@ -300,92 +300,91 @@ exit(0);
 
 
 
-void move(char *buffer ,int sock){
+void comand(char *buffer){
   int i, n;
   for(i=0;i<strlen(buffer)-1;i++){
 	char buffm[50];
   
 	if(buffer[i]=='l'||buffer[i]=='r'||buffer[i]=='f'||buffer[i]=='b'||buffer[i]=='s'){
-	  strncpy(buffm,&buffer[i],3);
-	  buffm[1]='\0';
-	  printf("%s \n",buffm);
-	  
-	  n = write(sock, buffm, 1);
+	  sprintf(tmp,"%c",aux[i]);
+          move(tmp);
 	  sleep(1);
 	}
+
   }
-  n = write(sock, "s", 1);
+	
 }
 
-/*
-void processCharacters(int sock, char *buff[], int nr){
-	int i;
-	for(i=0;i<nr;i++){
-    	send(sock, buff[i], strlen(buff[i]), 0);
-    	printf("Message sent: %s\n", buff[i]);
-		sleep(1);
-	}
-}*/
+void move(char *c){
+
+    int sockfd, portno, n;
+    struct sockaddr_in serv_addr;
+    struct hostent *server;
+    
+    char buffer[256];
+    
+    /* if (argc < 3) {
+       fprintf(stderr,"usage %s hostname port\n", argv[0]);
+       exit(0);
+    } */
+    
+    portno = 20232;              //portno = atoi(argv[2]);   // Port-ul
+    sockfd = socket(AF_INET, SOCK_STREAM, 0);
+    
+    if (sockfd < 0) 
+        error("ERROR opening socket");
+        
+    server = gethostbyname("193.226.12.217");          //server = gethostbyname(argv[1]);   //adresa IP a serverului
+    if (server == NULL) {
+        fprintf(stderr,"ERROR, no such host\n");
+        exit(0);
+    }
+    
+    bzero((char *) &serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    
+    bcopy((char *)server->h_addr, 
+         (char *)&serv_addr.sin_addr.s_addr,
+         server->h_length);
+         
+    serv_addr.sin_port = htons(portno);
+    
+    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
+        error("ERROR connecting");
+           
+    //printf("Please enter the message: ");  //comanda pt miscare
+    
+    bzero(buffer,256);
+    strcpy(buffer,c);
+    //fgets(buffer,255,stdin);
+    
+    n = write(sockfd,buffer,strlen(buffer));
+    if (n < 0) 
+         error("ERROR writing to socket");
+         
+    bzero(buffer,256);
+    
+    n = read(sockfd,buffer,255);
+    if (n < 0) 
+         error("ERROR reading from socket");
+         
+    printf("%s\n",buffer);
+    close(sockfd);
+    }
+
 
 int main(int argc, char* argv[])
 {
-   int sock = 0, portNr, n;
-   struct sockaddr_in serv_addr;
-   struct hostent *server;
-
-   char buffer[256];
-
-
-   portNr = 20236;
-
-   /* Create a socket point */
-   sock = socket(AF_INET, SOCK_STREAM, 0);
-
-   if (sock < 0) {
-      perror("ERROR opening socket");
-      exit(1);
-   }
-
-   server = gethostbyname("193.226.12.217");
-   if (server == NULL) {
-      fprintf(stderr,"ERROR, no such host\n");
-      exit(0);
-   }
-
-   bzero((char *) &serv_addr, sizeof(serv_addr));
-   serv_addr.sin_family = AF_INET;
-   bcopy((char *)server->h_addr, (char *)&serv_addr.sin_addr.s_addr, server->h_length);
-   serv_addr.sin_port = htons(portNr);
-
-   
-   if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0) {
-      perror("ERROR connecting");
-      exit(1);
-   }
-
-   /* Now ask for a message from the user, this message
-      * will be read by server
-   */
-       printf("Please enter the message: ");
-       bzero(buffer, 256);
-       fgets(buffer, 255, stdin);
-
-       /* Now read server response */
-       printf("%s\n", buffer);
-   
-        char comenzi[50];
         detect_position();
         initX = myX;
         initY = myY;
 		
-        move(buffer, sock);
+       	comanda("frlrflbs");
+    	move("s");
+	
         detect_position();
         printf("initial coords: %d, %d\n", initX, initY);
 		    printf("current coords: %d, %d\n", myX, myY);
-        //comenzi=strategie();
-        //socket_con(comenzi);
-	
-		close(sock);
-
+    
 		return 0;
 }

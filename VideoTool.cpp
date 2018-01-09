@@ -30,14 +30,16 @@ int initX, initY;
 int enemyX,enemyY;
 //initial min and max HSV filter values.
 //these will be changed using trackbars
-int H_MIN = 169;
-int H_MAX = 185;
-int S_MIN = 20;
+
+//roz
+int H_MIN = 168;
+int H_MAX = 256;
+int S_MIN = 60;
 int S_MAX = 256;
-int V_MIN = 105;
+int V_MIN = 70;
 int V_MAX = 256;
 
-
+// nu mai stiu
 int H_MIN2 = 27;
 int H_MAX2 = 185;
 int S_MIN2 = 65;

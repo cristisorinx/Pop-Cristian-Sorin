@@ -207,7 +207,8 @@ void trackFilteredObject(int &x, int &y, Mat threshold, Mat &cameraFeed) {
 	}
 }
 void detect_position(){
-    bool trackObjects = true;
+	
+    	bool trackObjects = true;
 	bool useMorphOps = true;
 
 	Point p;
@@ -231,8 +232,7 @@ void detect_position(){
 	//start an infinite loop where webcam feed is copied to cameraFeed matrix
 	//all of our operations will be performed within this loop
 
-
-
+	int meORenemy = 0; // 0 <- me , 1 <-enemy
 	
 	while (1) {
 
@@ -243,8 +243,10 @@ void detect_position(){
 		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
 		//filter HSV image between values and store filtered image to
 		//threshold matrix
-		inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
-     
+			if(meORenemy ==0){
+			inRange(HSV, Scalar(H_MIN, S_MIN, V_MIN), Scalar(H_MAX, S_MAX, V_MAX), threshold);
+     			meORenemy = 1;
+				
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if (useMorphOps)
@@ -252,27 +254,19 @@ void detect_position(){
 		//pass in thresholded frame to our object tracking function
 		//this function will return the x and y coordinates of the
 		//filtered object
-		if (trackObjects)
-{
+			if (trackObjects)
+			{
 			trackFilteredObject(x, y, threshold, cameraFeed);
-                  myX=x;
-                  myY=y;
-}
-		//show frames
-		imshow(windowName2, threshold);
-		imshow(windowName, cameraFeed);
-		//imshow(windowName1, HSV);
-		setMouseCallback("Original Image", on_mouse, &p);
-		//delay 30ms so that screen can refresh.
-		//image will not appear without this waitKey() command
-		waitKey(30);
-    //store image to matrix
-		capture.read(cameraFeed);
-		//convert frame from BGR to HSV colorspace
-		cvtColor(cameraFeed, HSV, COLOR_BGR2HSV);
-		//filter HSV image between values and store filtered image to
-		//threshold matrix
+			
+                 	 myX=x;
+                 	 myY=y;
+			}
+				
+		}else 
+			if(meORenemy == 1){
 		inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), threshold);
+			meORenemy = 0;
+				
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
 		if (useMorphOps)
@@ -280,44 +274,30 @@ void detect_position(){
 		//pass in thresholded frame to our object tracking function
 		//this function will return the x and y coordinates of the
 		//filtered object
-		if (trackObjects)
-                 {
-			trackFilteredObject(x, y, threshold, cameraFeed);
-                  enemyX=x;
-                  enemyY=y;
-                 } 
+				if (trackObjects)
+                		{
+				trackFilteredObject(x, y, threshold, cameraFeed);
+                 		
+				enemyX=x;
+                  		enemyY=y;
+                 		} 
+		}
+			
 		//show frames
 		imshow(windowName2, threshold);
 		imshow(windowName, cameraFeed);
-		//imshow(windowName1, HSV);
+		imshow(windowName1, HSV);
 		setMouseCallback("Original Image", on_mouse, &p);
 		//delay 30ms so that screen can refresh.
 		//image will not appear without this waitKey() command
 		waitKey(30);
-exit(0);
+		//exit(0);
 	}
 }
 
+void move(char *buffer){
 
-
-void comand(char *buffer){
-  int i, n;
-  for(i=0;i<strlen(buffer)-1;i++){
-	char buffm[50];
-  
-	if(buffer[i]=='l'||buffer[i]=='r'||buffer[i]=='f'||buffer[i]=='b'||buffer[i]=='s'){
-	  sprintf(tmp,"%c",aux[i]);
-          move(tmp);
-	  sleep(1);
-	}
-
-  }
-	
-}
-
-void move(char *c){
-
-    int sockfd, portno, n;
+    int sockfd, portno, n,i;
     struct sockaddr_in serv_addr;
     struct hostent *server;
     
@@ -349,15 +329,31 @@ void move(char *c){
          
     serv_addr.sin_port = htons(portno);
     
-    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) 
+    if (connect(sockfd,(struct sockaddr *) &serv_addr,sizeof(serv_addr)) < 0) //conectare
         error("ERROR connecting");
-           
-    //printf("Please enter the message: ");  //comanda pt miscare
-    
-    bzero(buffer,256);
-    strcpy(buffer,c);
+          
+	
+	for(i=0;i<strlen(buffer)-1;i++){
+	char tmp[3];
+  
+		if(buffer[i]=='l'||buffer[i]=='r'||buffer[i]=='f'||buffer[i]=='b'||buffer[i]=='s'){
+	  		sprintf(tmp,"%c",buffer[i]);
+          		if(send(sockfd,tmp,strlen(tmp),0) < 0){
+		  		printf("Fail sending the command...");
+	  		}
+	  		sleep(1);
+		}
+	}
+	
+	char message[2];
+	
+    	sprintf(message,"s");
+	send(sockfd,message,strlen(message),0);
+
+    //bzero(buffer,256);
+    //strcpy(buffer,c);
     //fgets(buffer,255,stdin);
-    
+    /*
     n = write(sockfd,buffer,strlen(buffer));
     if (n < 0) 
          error("ERROR writing to socket");
@@ -367,9 +363,10 @@ void move(char *c){
     n = read(sockfd,buffer,255);
     if (n < 0) 
          error("ERROR reading from socket");
-         
-    printf("%s\n",buffer);
-    close(sockfd);
+         */
+    
+	printf("%s\n",buffer);
+    	close(sockfd);
     }
 
 
@@ -379,8 +376,7 @@ int main(int argc, char* argv[])
         initX = myX;
         initY = myY;
 		
-       	comanda("frlrflbs");
-    	move("s");
+    	move("frlrflbs");
 	
         detect_position();
         printf("initial coords: %d, %d\n", initX, initY);

@@ -220,8 +220,10 @@ void detect_position(){
 	Mat HSV;
 	//matrix storage for binary threshold image
 	Mat threshold;
+	Mat threshold1;
 	//x and y values for the location of the object
 	int x = 0, y = 0;
+	int x1 = 0, y1 = 0;
 	//create slider bars for HSV filtering
 	createTrackbars();
 	//video capture object to acquire webcam feed
@@ -266,19 +268,19 @@ void detect_position(){
 				
 		}else 
 			if(meORenemy == 1){
-		inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), threshold);
-			meORenemy = 0;
+				inRange(HSV, Scalar(H_MIN2, S_MIN2, V_MIN2), Scalar(H_MAX2, S_MAX2, V_MAX2), threshold);
+				meORenemy = 0;
 				
 		//perform morphological operations on thresholded image to eliminate noise
 		//and emphasize the filtered object(s)
-		if (useMorphOps)
-			morphOps(threshold);
+			if (useMorphOps)
+				morphOps(threshold1);
 		//pass in thresholded frame to our object tracking function
 		//this function will return the x and y coordinates of the
 		//filtered object
 				if (trackObjects)
                 		{
-				trackFilteredObject(x, y, threshold, cameraFeed);
+				trackFilteredObject(x1, y1, threshold1, cameraFeed);
                  		
 				enemyX=x;
                   		enemyY=y;
